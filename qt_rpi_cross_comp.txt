@@ -1,0 +1,99 @@
+raspberry pi
+
+sudo nano /etc/apt/sources.list
+
+remove # form 3rd line 
+
+#deb-src http://raspbian.raspberrypi.org/raspbian/ buster main contrib non-free$
+
+pi@raspberrypi:~ $ sudo apt-get update
+
+sudo apt-get build-dep qt4-x11
+
+sudo apt-get build-dep qtbase-opensource-src
+
+sudo apt-get install libegl1-mesa libegl1-mesa-dev libgles2-mesa libgles2-mesa-dev
+
+sudo apt-get install wiringpi libnfc-bin libnfc-dev fonts-texgyre libts-dev
+
+install multimedia
+
+sudo apt-get install libbluetooth-dev bluez-tools gstreamer1.0-plugins* libgstreamer1.0-dev libstreamer-plugins-base1.0-dev libopenal-data libsndio7.0 libopenal1 libopenal-dev pulseaudio
+
+sudo gpasswd -a pi render
+
+sudo mkdir /usr/local/qt5pi
+
+sudo chown pi:pi  /usr/local/qt5pi
+
+
+ubuntu
+#######################################
+sudo apt update
+
+sudo apt install build-essential 
+
+mkdir ~/raspi
+
+cd ~/raspi
+
+ git clone https://github.com/raspberrypi/tools
+
+ mkdir sysroot sysroot/usr
+
+  rsync -avz pi@10.42.0.205:/lib sysroot                #my pi3 had this ip , perhaps you have a different one 
+  rsync -avz pi@10.42.0.205:/usr/include sysroot/usr
+  rsync -avz pi@10.42.0.205:/usr/lib sysroot/usr
+  
+wget https://raw.githubusercontent.com/riscv/riscv-poky/master/scripts/sysroot-relativelinks.py
+  chmod +x sysroot-relativelinks.py 
+  ./sysroot-relativelinks.py sysroot
+  
+ git clone git://code.qt.io/qt/qtbase.git -b 5.12.6
+
+cd /qtbase
+
+./configure -release -opengl es2 -device linux-rasp-pi3-vc4-g++ -device-option CROSS_COMPILE=~/raspi/tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/bin/arm-linux-gnueabihf- -sysroot ~/raspi/sysroot -opensource -confirm-license -make libs -prefix/usr/local/qt5pi -extprefix ~/raspi/qt5pi -hostprefix ~/raspi/qt5 -no-use-gold-linker -v
+ 
+make -j4
+
+make install
+
+cd ..  back to raspi 
+
+rsync -avz qt5pi pi@10.42.0.205:/usr/local
+
+then to pi console again 
+##############################
+
+echo /usr/local/qt5pi/lib | sudo tee /etc/ld.so.conf.d/qt5pi.conf 
+
+sudo ldconfig
+
+
+back to ubuntu
+##############################
+in raspi
+
+ git clone git://code.qt.io/qt/qtdeclarative.git -b 5.12.6
+
+cd to qtdeclarative
+
+~/raspi/qt5/bin/qmake 
+
+make
+
+make install
+
+cd to raspi back to 
+
+rsync -avz qt5pi pi@10.42.0.205:/usr/local
+
+
+
+
+
+
+
+
+
